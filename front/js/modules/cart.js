@@ -14,7 +14,7 @@ fetch("http://localhost:3000/api/products/")
     //adding products
     productsArray = products;
     console.log(products);
-    rellenar(products);
+    rellenar(data);
   });
 
 function rellenar(products) {
@@ -27,7 +27,7 @@ function rellenar(products) {
           <h2>${products.name}t</h2>
           <p>Green</p>
 
-          <p>€${products.price}</p>
+          <p>€${productsArray.[products.id].price}</p>
         </div>
         <div class="cart__item__content__settings">
           <div class="cart__item__content__settings__quantity">
