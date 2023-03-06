@@ -1,40 +1,32 @@
-// getting product  Id 
+//import products from "./modules/products.js";
+import utilidades from "./modules/products.js";
 
-const urlSearchParams = new URLSearchParams(window.location.search);
-const id = urlSearchParams.get("id");
-console.log("El id es:", id);
+// import addToCart from "./modules/cart.js";
+// Filter product by id
 
-// Filter product by id 
-
-fetch('http://localhost:3000/api/products/'+ id)
+const id = utilidades.getProductId();
+console.log(id);
+fetch("http://localhost:3000/api/products/" + id)
   .then((response) => response.json())
   .then((products) => {
     //showing the data by console
- 
-  // Just console log for testing the data
-  console.log(products);
-  // adding information to the DOM.
-  document.getElementById("title").innerHTML = products.name;  
-  document.getElementById("price").innerHTML = products.price;
-  document.getElementById("description").innerHTML = products.description;
+    console.log(products);
+    // Just console log for testing the data
+    console.log(products);
+    // adding information to the DOM.
 
- addColors(products);
-});
+    document.getElementById("item_img").src = products.imageUrl;
+    document.getElementById("title").innerHTML = products.name;
+    document.getElementById("price").innerHTML = products.price;
+    document.getElementById("description").innerHTML = products.description;
 
-// Funtion to add colors to the option selector DOM 
+    utilidades.addColors(products);
+  });
 
- function addColors(products){
-    let options = document.querySelector("#colors");
+// const buttonAddToCart = document.getElementById("addToCart");
+// buttonAddToCart.addEventListener("click", prueba.addToCart());
 
-    products.colors.forEach(element => {
-        fillColors =`
-        <option value=${element}> ${element}</option>
+// TODO // listener function to add products to cart
+// functions can access variables in global scope
 
-        `;
-
-        colors.innerHTML += fillColors
-    });
-    
-return products;
-}
-// End function add option selection
+// conditional and for loop to check if product object is in cart
