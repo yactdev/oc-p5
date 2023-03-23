@@ -98,7 +98,6 @@ function addListener() {
       localStorage.setItem("cart", JSON.stringify(result));
       console.log(result);
       console.log(element.getAttribute("data-id"));
-      location.reload();
     });
   });
 }

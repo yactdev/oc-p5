@@ -1,6 +1,6 @@
 const data = localStorage.getItem("cart");
 console.log(data);
-fetch("http://localhost:3000/api/order", {
+fetch("http://localhost:3000/api/products/order", {
   method: "POST", // or 'PUT'
   headers: {
     "Content-Type": "application/json",
