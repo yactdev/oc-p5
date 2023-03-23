@@ -73,6 +73,8 @@ addButton.addEventListener("click", (e) => {
   }
 });
 
+
+
 // TODO End function add option selection
 // TODO get the cart from localStorage
 

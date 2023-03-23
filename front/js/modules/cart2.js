@@ -101,3 +101,18 @@ function addListener() {
     });
   });
 }
+
+function createOrderInfo() {
+  const firstName = document.getElementById("firstName").value;
+  const lastName = document.getElementById("lastName").value;
+  const address = document.getElementById("address").value;
+  const city = document.getElementById("city").value;
+  const mail = document.getElementById("email").vlaue;
+  let orderInfo = [firstName, lastName, address, city, mail];
+  console.log(city);
+  console.log(orderInfo);
+}
+let orderButton = document.getElementById("order");
+orderButton.addEventListener("click", () => {
+  createOrderInfo();
+});
