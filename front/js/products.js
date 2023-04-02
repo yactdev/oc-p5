@@ -1,5 +1,3 @@
-export default { getProductId, addColors };
-
 function getProductId() {
   let urlSearchParams = new URLSearchParams(window.location.search);
   let id = urlSearchParams.get("id");
@@ -22,6 +20,24 @@ function addColors(products) {
 
   return products;
 }
+const id = getProductId();
+console.log(id);
+fetch("http://localhost:3000/api/products/" + id)
+  .then((response) => response.json())
+  .then((products) => {
+    //showing the data by console
+    console.log(products);
+    // Just console log for testing the data
+    console.log(products);
+    // adding information to the DOM.
+
+    document.getElementById("item_img").src = products.imageUrl;
+    document.getElementById("title").innerHTML = products.name;
+    document.getElementById("price").innerHTML = products.price;
+    document.getElementById("description").innerHTML = products.description;
+
+    addColors(products);
+  });
 // TODO
 // add product to the cart
 let name_field = document.querySelector("#title").value;
@@ -86,6 +102,30 @@ function qtyValidation(qty) {
   if (qty >= 1 && qty <= 100) {
     //// Addig products to the localstorage
     return true;
+  }
+}
+
+// regular expressions for validation
+let emailRegExp =
+  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+let charAlphaRegExp = /^[A-Za-z -]{3,32}$/;
+let addressRegExp = /^[A-Za-z0-9 ]{7,32}$/;
+const firstName = document.getElementById("firstName").value;
+
+firstName.addEventListener("change", checkFirstName);
+let firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
+function checkFirstName() {
+  if (charAlphaRegExp.test(firstName.value)) {
+    firstNameErrorMsg.innerHTML = null;
+    firstName.style.border = "2px solid green";
+    validFirstName = true;
+  } else if (
+    charAlphaRegExp.test(firstName.value) === false ||
+    firstName.value === ""
+  ) {
+    firstNameErrorMsg.innerHTML = "Please enter a valid first name";
+    firstName.style.border = "2px solid red";
+    validFirstName = false;
   }
 }
 

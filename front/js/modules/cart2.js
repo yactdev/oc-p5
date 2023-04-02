@@ -146,8 +146,6 @@ function createOrderInfo(cartData) {
       data.orderId; // this is the confirmation number
       console.log(data.orderId);
       // use urlSearchParams
-      let urlSearchParams = new URLSearchParams(window.location.search);
-      let id = urlSearchParams.get(data.orderId);
 
       const orderIdConfirmation = "confirmation.html?orderId=" + data.orderId;
       // create a variable with confirmation page url using the orderId
@@ -163,3 +161,35 @@ orderButton.addEventListener("click", (e) => {
   e.preventDefault();
   createOrderInfo(cartArray);
 });
+
+// regular expressions for validation
+let emailRegExp =
+  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+let charAlphaRegExp = /^[A-Za-z -]{3,32}$/;
+let addressRegExp = /^[A-Za-z0-9 ]{7,32}$/;
+const firstName = document.getElementById("firstName");
+const lastName = document.getElementById("lastName");
+const address = document.getElementById("address");
+const city = document.getElementById("city");
+const email = document.getElementById("email");
+
+function validationField(field, errorHandleId, regExp) {
+  field.addEventListener("change", checkFieldContent);
+  let ErrorMsg = document.getElementById(errorHandleId);
+  function checkFieldContent() {
+    if (regExp.test(field.value)) {
+      ErrorMsg.innerHTML = null;
+      field.style.border = "2px solid green";
+      validFirstName = true;
+    } else if (regExp.test(field.value) === false || field.value === "") {
+      ErrorMsg.innerHTML = "Please enter a valid first " + field.name;
+      field.style.border = "2px solid red";
+      validFirstName = false;
+    }
+  }
+}
+validationField(firstName, "firstNameErrorMsg", charAlphaRegExp);
+validationField(lastName, "lastNameErrorMsg", charAlphaRegExp);
+validationField(address, "addressErrorMsg", addressRegExp);
+validationField(city, "cityErrorMsg", charAlphaRegExp);
+validationField(email, "emailErrorMsg", emailRegExp);
