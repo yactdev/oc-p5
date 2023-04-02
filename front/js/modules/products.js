@@ -44,10 +44,19 @@ function addToCart() {
   };
 
   let old_data = JSON.parse(localStorage.getItem("cart"));
-  old_data.push(carto);
-  localStorage.setItem("cart", JSON.stringify(old_data));
-}
+  console.log(old_data);
+  console.log(carto.id);
 
+  let resultado = old_data.find(({ id }) => id === carto.id);
+  console.log(resultado);
+  if (!resultado) {
+    console.log("no existe");
+    old_data.push(carto);
+    localStorage.setItem("cart", JSON.stringify(old_data));
+  } else {
+    return console.log(old_data.indexOf(carto.id));
+  }
+}
 // function addToCart() {
 const addButton = document.querySelector("#addToCart");
 addButton.addEventListener("click", (e) => {
@@ -64,7 +73,7 @@ addButton.addEventListener("click", (e) => {
     alert("Please select a color");
   } else {
     // Quantity  validation  and error message
-    if (qty_field.value >= 1 && qty_field.value <= 100) {
+    if (qtyValidation(qty_field.value)) {
       //// Addig products to the localstorage
       addToCart();
     } else {
@@ -73,7 +82,21 @@ addButton.addEventListener("click", (e) => {
   }
 });
 
+function qtyValidation(qty) {
+  if (qty >= 1 && qty <= 100) {
+    //// Addig products to the localstorage
+    return true;
+  }
+}
 
+// function productExistValidation(cartArray, productId) {
+//   const result = cartArray.find(({ id }) => id === productId);
+//   if (result) {
+//     console.log("Existe");
+//   } else {
+//     console.log("No existe");
+//   }
+// }
 
 // TODO End function add option selection
 // TODO get the cart from localStorage

@@ -19,12 +19,15 @@ fetch("http://localhost:3000/api/products/")
   .then((products) => {
     //showing the data by console
     //adding products
-    productArray = products;
+
     console.log(products);
-    cartBuilder(productArray);
+    cartBuilder(products);
   })
   .then(() => {
     addListener();
+  })
+  .then(() => {
+    console.log("testing");
   })
   .catch((err) => console.log(err));
 
@@ -101,18 +104,62 @@ function addListener() {
     });
   });
 }
-
-function createOrderInfo() {
+function test(cartData) {
+  let otro = [];
+  cartData.forEach((element) => {
+    let otros = otro.push(element.id);
+  });
+  return otro;
+}
+test(cartArray);
+function createOrderInfo(cartData) {
   const firstName = document.getElementById("firstName").value;
   const lastName = document.getElementById("lastName").value;
   const address = document.getElementById("address").value;
   const city = document.getElementById("city").value;
-  const mail = document.getElementById("email").vlaue;
-  let orderInfo = [firstName, lastName, address, city, mail];
+  const email = document.getElementById("email").value;
+  order = {
+    contact: {
+      firstName: firstName,
+      lastName: lastName,
+      address: address,
+      city: city,
+      email: email,
+    },
+    products: test(cartData),
+  };
+
   console.log(city);
-  console.log(orderInfo);
+  console.log(order);
+
+  localStorage.setItem("order", JSON.stringify(order)); //
+  fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify(order),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("por aqui");
+      data.orderId; // this is the confirmation number
+      console.log(data.orderId);
+      // use urlSearchParams
+      let urlSearchParams = new URLSearchParams(window.location.search);
+      let id = urlSearchParams.get(data.orderId);
+
+      const orderIdConfirmation = "confirmation.html?orderId=" + data.orderId;
+      // create a variable with confirmation page url using the orderId
+      window.location.href = orderIdConfirmation;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
+
 let orderButton = document.getElementById("order");
-orderButton.addEventListener("click", () => {
-  createOrderInfo();
+orderButton.addEventListener("click", (e) => {
+  e.preventDefault();
+  createOrderInfo(cartArray);
 });
