@@ -63,13 +63,18 @@ function addToCart() {
   console.log(old_data);
   console.log(carto.id);
 
-  let resultado = old_data.find(({ id }) => id === carto.id);
+  let resultado = old_data.find(
+    (p) => p.id === carto.id && p.color == carto.color
+  );
   console.log(resultado);
-  if (!resultado) {
+  if (resultado == undefined) {
     console.log("no existe");
+
     old_data.push(carto);
     localStorage.setItem("cart", JSON.stringify(old_data));
   } else {
+    resultado.qty = Number(resultado.qty) + Number(carto.qty);
+    localStorage.setItem("cart", JSON.stringify(old_data));
     return console.log(old_data.indexOf(carto.id));
   }
 }
@@ -102,30 +107,6 @@ function qtyValidation(qty) {
   if (qty >= 1 && qty <= 100) {
     //// Addig products to the localstorage
     return true;
-  }
-}
-
-// regular expressions for validation
-let emailRegExp =
-  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-let charAlphaRegExp = /^[A-Za-z -]{3,32}$/;
-let addressRegExp = /^[A-Za-z0-9 ]{7,32}$/;
-const firstName = document.getElementById("firstName").value;
-
-firstName.addEventListener("change", checkFirstName);
-let firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
-function checkFirstName() {
-  if (charAlphaRegExp.test(firstName.value)) {
-    firstNameErrorMsg.innerHTML = null;
-    firstName.style.border = "2px solid green";
-    validFirstName = true;
-  } else if (
-    charAlphaRegExp.test(firstName.value) === false ||
-    firstName.value === ""
-  ) {
-    firstNameErrorMsg.innerHTML = "Please enter a valid first name";
-    firstName.style.border = "2px solid red";
-    validFirstName = false;
   }
 }
 

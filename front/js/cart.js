@@ -3,8 +3,9 @@ let cartArray = JSON.parse(localStorage.getItem("cart"));
 
 // selection of the html where the car information will be rendered.
 let item = document.querySelector("#cart__items");
-
+let productInfo = "";
 // variable of Total quantity of items in the cart
+
 let totalQty = 0;
 let totalAmount = 0;
 if (!cartArray) {
@@ -12,6 +13,7 @@ if (!cartArray) {
   const emptycart = [];
   localStorage.setItem("cart", JSON.stringify(emptycart)); //
 }
+
 // getting all product data from de server
 
 fetch("http://localhost:3000/api/products/")
@@ -19,9 +21,10 @@ fetch("http://localhost:3000/api/products/")
   .then((products) => {
     //showing the data by console
     //adding products
-
+    setProductInfo(products);
     console.log(products);
     cartBuilder(products);
+    return;
   })
   .then(() => {
     addListener();
@@ -31,9 +34,27 @@ fetch("http://localhost:3000/api/products/")
   })
   .catch((err) => console.log(err));
 
+function setProductInfo(info) {
+  productInfo = info;
+}
+console.log("productinfo", productInfo);
+
 // Function building the final shopping cart
+function cartUpdate() {
+  console.log("deleting DOM....");
+  let productHolder = document.querySelectorAll(".cart__item");
+  productHolder.forEach((element) => {
+    element.remove();
+  });
+  console.log("building cart");
+  cartBuilder(productInfo);
+  addListener();
+}
 
 function cartBuilder(productArray) {
+  let cartArray = JSON.parse(localStorage.getItem("cart"));
+  let totalAmount = 0;
+  let totalQty = 0;
   if (cartArray && cartArray.length >= 1) {
     cartArray.forEach((element) => {
       let built = productArray.find(
@@ -88,19 +109,26 @@ if (!cartArray) {
   alert("empty cart");
 }
 
-function deleteOne(arr, id) {
-  return arr.filter((obj) => obj.id !== id);
+function deleteOne(arr, id, color) {
+  return arr.filter((obj) => obj.id !== id || obj.color !== color);
 }
 function addListener() {
   let deleteProd = document.querySelectorAll(".deleteItem");
-
+  let cartArray = JSON.parse(localStorage.getItem("cart"));
   deleteProd.forEach((element) => {
     element.addEventListener("click", () => {
-      let productId = element.getAttribute("data-id");
-      let result = deleteOne(cartArray, productId);
+      const article = document.querySelector(".cart__item");
+      const color = article.dataset.color;
+
+      const productId = element.getAttribute("data-id");
+
+      let result = deleteOne(cartArray, productId, color);
+
       localStorage.setItem("cart", JSON.stringify(result));
-      console.log(result);
-      console.log(element.getAttribute("data-id"));
+      cartUpdate();
+      console.log("Eliminando ", result);
+      console.log("id", productId);
+      console.log("color", color);
     });
   });
 }
