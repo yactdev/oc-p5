@@ -21,7 +21,7 @@ fetch("http://localhost:3000/api/products/")
   .then((products) => {
     //showing the data by console
     //adding products
-    setProductInfo(products);
+    //setProductInfo(products);
     console.log(products);
     cartBuilder(products);
     return;
@@ -109,26 +109,27 @@ if (!cartArray) {
   alert("empty cart");
 }
 
-function deleteOne(arr, id, color) {
-  return arr.filter((obj) => obj.id !== id || obj.color !== color);
+function deleteOne(element) {
+  const cartArray = JSON.parse(localStorage.getItem("cart"));
+  const article = element.closest("article");
+  const color = article.getAttribute("data-color");
+  const id = article.getAttribute("data-id");
+  const filterResult = cartArray.filter(
+    (obj) => obj.id !== id || obj.color !== color
+  );
+  console.log(filterResult);
+  localStorage.setItem("cart", JSON.stringify(filterResult));
 }
+
+// Add event listener to the articles
+
 function addListener() {
-  let deleteProd = document.querySelectorAll(".deleteItem");
-  let cartArray = JSON.parse(localStorage.getItem("cart"));
+  let deleteProd = document.querySelectorAll(".cart__item");
+  const deleteItems = document.querySelector(".deleteItem");
+
   deleteProd.forEach((element) => {
     element.addEventListener("click", () => {
-      const article = document.querySelector(".cart__item");
-      const color = article.dataset.color;
-
-      const productId = element.getAttribute("data-id");
-
-      let result = deleteOne(cartArray, productId, color);
-
-      localStorage.setItem("cart", JSON.stringify(result));
-      cartUpdate();
-      console.log("Eliminando ", result);
-      console.log("id", productId);
-      console.log("color", color);
+      deleteOne(deleteItems);
     });
   });
 }
