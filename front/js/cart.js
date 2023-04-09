@@ -154,55 +154,73 @@ function test(cartData) {
   });
   return otro;
 }
-test(cartProducts);
+
 function createOrderInfo(cartData) {
   const firstName = document.getElementById("firstName").value;
   const lastName = document.getElementById("lastName").value;
   const address = document.getElementById("address").value;
   const city = document.getElementById("city").value;
   const email = document.getElementById("email").value;
-  order = {
-    contact: {
-      firstName: firstName,
-      lastName: lastName,
-      address: address,
-      city: city,
-      email: email,
-    },
-    products: test(cartData),
-  };
+  if (
+    firstName == "" ||
+    lastName == "" ||
+    address == "" ||
+    city == "" ||
+    email == ""
+  ) {
+    alert("Please fill the form");
+  } else {
+    order = {
+      contact: {
+        firstName: firstName,
+        lastName: lastName,
+        address: address,
+        city: city,
+        email: email,
+      },
+      products: test(cartData),
+    };
 
-  console.log(city);
-  console.log(order);
+    console.log(city);
+    console.log(order);
 
-  localStorage.setItem("order", JSON.stringify(order));
-  fetch("http://localhost:3000/api/products/order", {
-    method: "POST",
-    headers: {
-      "Content-type": "application/json",
-    },
-    body: JSON.stringify(order),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("por aqui");
-      data.orderId; // this is the confirmation number
-      console.log(data.orderId);
-      // use urlSearchParams
-
-      const orderIdConfirmation = "confirmation.html?orderId=" + data.orderId;
-      // create a variable with confirmation page url using the orderId
-      window.location.href = orderIdConfirmation;
+    // false) {
+    localStorage.setItem("order", JSON.stringify(order));
+    fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(order),
     })
-    .catch((err) => {
-      console.log(err);
-    });
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("por aqui");
+        data.orderId; // this is the confirmation number
+        console.log(data.orderId);
+        // use urlSearchParams
+
+        const orderIdConfirmation = "confirmation.html?orderId=" + data.orderId;
+        // create a variable with confirmation page url using the orderId
+        window.location.href = orderIdConfirmation;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 }
 
+let validationStatus = true;
 let orderButton = document.getElementById("order");
+orderButton.Disabled = true;
+
 orderButton.addEventListener("click", (e) => {
   e.preventDefault();
-  createOrderInfo(cartProducts);
+  if (validationStatus == true) {
+    createOrderInfo(cartProducts);
+  } else {
+    alert("Please fix the field");
+  }
 });
 
 // regular expressions for validation
@@ -218,6 +236,7 @@ const email = document.getElementById("email");
 
 function validationField(field, errorHandleId, regExp) {
   field.addEventListener("change", checkFieldContent);
+
   let ErrorMsg = document.getElementById(errorHandleId);
   function checkFieldContent() {
     if (regExp.test(field.value)) {
@@ -229,6 +248,8 @@ function validationField(field, errorHandleId, regExp) {
       field.style.border = "2px solid red";
       validFirstName = false;
     }
+    validationStatus = validationStatus * validFirstName;
+    console.log(validationStatus);
   }
 }
 validationField(firstName, "firstNameErrorMsg", charAlphaRegExp);
