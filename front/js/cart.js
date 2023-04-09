@@ -3,7 +3,7 @@ let cartProducts = JSON.parse(localStorage.getItem("cart"));
 
 // Select DOM HTML elements
 const ARTICLES = document.querySelector(".cart__item");
-const DELETE_BUTTON = document.querySelector(".deleteItem");
+
 const SECTION = document.querySelector("#cart__items");
 
 // verification of cart status
@@ -148,11 +148,11 @@ function addListener() {
 //// Send order data to the server
 
 function test(cartData) {
-  let otro = [];
+  let productInfoToSend = [];
   cartData.forEach((element) => {
-    let otros = otro.push(element.id);
+    let otros = productInfoToSend.push(element.id);
   });
-  return otro;
+  return productInfoToSend;
 }
 
 function createOrderInfo(cartData) {
@@ -180,9 +180,6 @@ function createOrderInfo(cartData) {
       },
       products: test(cartData),
     };
-
-    console.log(city);
-    console.log(order);
 
     // false) {
     localStorage.setItem("order", JSON.stringify(order));
@@ -212,8 +209,8 @@ function createOrderInfo(cartData) {
 
 let validationStatus = true;
 let orderButton = document.getElementById("order");
-orderButton.Disabled = true;
 
+// add listener to the order button
 orderButton.addEventListener("click", (e) => {
   e.preventDefault();
   if (validationStatus == true) {
@@ -234,6 +231,7 @@ const address = document.getElementById("address");
 const city = document.getElementById("city");
 const email = document.getElementById("email");
 
+// function to validate the fields
 function validationField(field, errorHandleId, regExp) {
   field.addEventListener("change", checkFieldContent);
 

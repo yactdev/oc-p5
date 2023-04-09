@@ -109,21 +109,3 @@ function qtyValidation(qty) {
     return true;
   }
 }
-
-// function productExistValidation(cartArray, productId) {
-//   const result = cartArray.find(({ id }) => id === productId);
-//   if (result) {
-//     console.log("Existe");
-//   } else {
-//     console.log("No existe");
-//   }
-// }
-
-// TODO End function add option selection
-// TODO get the cart from localStorage
-
-// TODO put productObject in global space
-
-// TODO use listener functions to change color and quantity!!!
-// TODO listener function to add products to cart
-// TODO functions can access variables in global scope
