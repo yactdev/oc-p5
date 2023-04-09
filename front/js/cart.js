@@ -1,135 +1,238 @@
-// getting cart ionformation from localstorage
-let cartArray = JSON.parse(localStorage.getItem("cart"));
+// Get cart product information from localstorage.
+let cartProducts = JSON.parse(localStorage.getItem("cart"));
 
-// selection of the html where the car information will be rendered.
-let item = document.querySelector("#cart__items");
-let productInfo = "";
-// variable of Total quantity of items in the cart
+// Select DOM HTML elements
+const ARTICLES = document.querySelector(".cart__item");
+const DELETE_BUTTON = document.querySelector(".deleteItem");
+const SECTION = document.querySelector("#cart__items");
 
-let totalQty = 0;
-let totalAmount = 0;
-if (!cartArray) {
-  alert("The car is empty");
-  const emptycart = [];
-  localStorage.setItem("cart", JSON.stringify(emptycart)); //
+// verification of cart status
+function checkCart() {
+  let cartProducts = JSON.parse(localStorage.getItem("cart"));
+  if (!cartProducts || cartProducts == 0) {
+    alert("The car is empty");
+    const emptyCart = [];
+    localStorage.setItem("cart", JSON.stringify(emptyCart)); //
+  } else {
+    getProducts();
+  }
 }
 
-// getting all product data from de server
+checkCart();
 
-fetch("http://localhost:3000/api/products/")
-  .then((response) => response.json())
-  .then((products) => {
-    //showing the data by console
-    //adding products
-    //setProductInfo(products);
-    console.log(products);
-    cartBuilder(products);
-    return;
-  })
-  .then(() => {
-    addListener();
-  })
-  .then(() => {
-    console.log("testing");
-  })
-  .catch((err) => console.log(err));
-
-function setProductInfo(info) {
-  productInfo = info;
+// Get products information from the server.
+async function getProducts() {
+  let x = await fetch("http://localhost:3000/api/products/")
+    .then((res) => res.json())
+    .then((productsInfo) => {
+      renderCartItems(productsInfo);
+      calcTotal(productsInfo);
+    })
+    .then(() => {
+      addListener();
+    });
 }
-console.log("productinfo", productInfo);
 
-// Function building the final shopping cart
-function cartUpdate() {
+// add HTML elements to the DOM
+function renderCartItems(productsInfo) {
+  let cartProducts = JSON.parse(localStorage.getItem("cart"));
+  cartProducts.forEach((product) => {
+    let productInCart = productsInfo.find(
+      (productsInfo) => productsInfo._id === product.id
+    );
+    let htmlArticle = ` 
+        <article class="cart__item" data-id="${product.id}" data-color="${product.color}">
+            <div class="cart__item__img">
+                <img src="${productInCart.imageUrl}" alt="Photo of a sofa">
+            </div>
+            <div class="cart__item__content">
+                <div class="cart__item__content__description">
+                    <h2>${productInCart.name}t</h2>
+                        <p>${product.color}</p>
+                        <p>€${productInCart.price}</p>
+                </div>
+            <div class="cart__item__content__settings">
+            <div class="cart__item__content__settings__quantity">
+                <p>Quantity : </p>
+                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.qty}">
+      
+            </div>
+            <div class="cart__item__content__settings__delete" id = "#settings__delete">
+                <p class="deleteItem"  data-id="${product.id}">Delete</p>
+            </div>
+            </div>
+            </div>
+        </article>`;
+    // TODO remove this console log
+
+    SECTION.innerHTML += htmlArticle;
+  });
+}
+
+// total quantity of the order
+
+function calcTotal(cartInfo) {
+  let totalCartQty = 0;
+  let totalCartAmount = 0;
+  let htmlQty = document.getElementById("totalQuantity");
+  let htmlAmount = document.getElementById("totalPrice");
+  cartProducts.forEach((product) => {
+    let productInCart = cartInfo.find(
+      (cartInfo) => cartInfo._id === product.id
+    );
+    totalCartQty = totalCartQty + product.qty * 1;
+    totalCartAmount += productInCart.price * product.qty;
+  });
+  htmlQty.innerHTML = totalCartQty;
+  htmlAmount.innerHTML = totalCartAmount;
+}
+
+// add listener to the article items
+function clearDOM() {
   console.log("deleting DOM....");
   let productHolder = document.querySelectorAll(".cart__item");
   productHolder.forEach((element) => {
     element.remove();
   });
-  console.log("building cart");
-  cartBuilder(productInfo);
-  addListener();
 }
-
-function cartBuilder(productArray) {
-  let cartArray = JSON.parse(localStorage.getItem("cart"));
-  let totalAmount = 0;
-  let totalQty = 0;
-  if (cartArray && cartArray.length >= 1) {
-    cartArray.forEach((element) => {
-      let built = productArray.find(
-        (productArray) => productArray._id === element.id
-      );
-      // TODO console log just for testing TODO just remove it when done
-      console.log("este" + built.price);
-
-      // redering shopping cart information into the cart page
-
-      let showitems = ` <article class="cart__item" data-id="${built._id}" data-color="${element.color}">
-    <div class="cart__item__img">
-      <img src="${built.imageUrl}" alt="Photo of a sofa">
-    </div>
-    <div class="cart__item__content">
-      <div class="cart__item__content__description">
-        <h2>${built.name}t</h2>
-        <p>${element.color}</p>
-
-        <p>€${built.price}</p>
-      </div>
-      <div class="cart__item__content__settings">
-        <div class="cart__item__content__settings__quantity">
-          <p>Quantity : </p>
-          <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${element.qty}">
-          
-        </div>
-        <div class="cart__item__content__settings__delete" id = "#settings__delete">
-          <p class="deleteItem"  data-id="${built._id}">Delete</p>
-        </div>
-      </div>
-    </div>
-    </article>`;
-
-      // Total Amount counter
-      totalAmount = totalAmount + built.price * element.qty;
-      // Total quantity counter
-      totalQty = totalQty + element.qty * 1;
-      item.innerHTML += showitems;
-    });
-    // rendering quantity and price total
-    let item2 = document.getElementById("totalQuantity");
-    item2.innerHTML = totalQty;
-    console.log(totalQty);
-    let itemPrice = document.getElementById("totalPrice");
-    itemPrice.innerHTML = totalAmount;
-  }
-}
-
-if (!cartArray) {
-  console.log(cartArray.length);
-  alert("empty cart");
-}
-
 function deleteOne(element) {
   const cartArray = JSON.parse(localStorage.getItem("cart"));
   const article = element.closest("article");
   const color = article.getAttribute("data-color");
   const id = article.getAttribute("data-id");
   const filterResult = cartArray.filter(
-    (obj) => obj.id !== id || obj.color !== color
+    (obj) => obj.id != id || obj.color != color
   );
-  console.log(filterResult);
+  console.log("resultado color", filterResult.color);
   localStorage.setItem("cart", JSON.stringify(filterResult));
+  clearDOM();
+  checkCart();
+}
+
+function changeQuantity(element) {
+  const cartArray = JSON.parse(localStorage.getItem("cart"));
+  const article = element.closest("article");
+  const color = article.getAttribute("data-color");
+  const id = article.getAttribute("data-id");
+  const qtyValue = element.value;
+  const getProductQty = cartArray.findIndex(
+    (obj) => obj.id == id && obj.color == color
+  );
+  cartArray[getProductQty].qty = qtyValue;
+  if (element.value > 0 && element.value < 100) {
+    localStorage.setItem("cart", JSON.stringify(cartArray));
+  } else {
+    alert("Please select a valid quantity between 1 and 100");
+    clearDOM();
+    checkCart();
+  }
 }
 
 // Add event listener to the articles
 
 function addListener() {
-  let deleteProd = document.querySelectorAll(".cart__item");
-  const deleteItems = document.querySelector(".deleteItem");
-
-  deleteProd.forEach((element) => {
+  let deleteItems = document.querySelectorAll(".deleteItem");
+  let changeQuantities = document.querySelectorAll(".itemQuantity");
+  deleteItems.forEach((element) => {
     element.addEventListener("click", () => {
-      deleteOne(deleteItems);
+      deleteOne(element);
+    });
+  });
+  changeQuantities.forEach((element) => {
+    element.addEventListener("change", () => {
+      changeQuantity(element);
     });
   });
 }
+
+//// Send order data to the server
+
+function test(cartData) {
+  let otro = [];
+  cartData.forEach((element) => {
+    let otros = otro.push(element.id);
+  });
+  return otro;
+}
+test(cartProducts);
+function createOrderInfo(cartData) {
+  const firstName = document.getElementById("firstName").value;
+  const lastName = document.getElementById("lastName").value;
+  const address = document.getElementById("address").value;
+  const city = document.getElementById("city").value;
+  const email = document.getElementById("email").value;
+  order = {
+    contact: {
+      firstName: firstName,
+      lastName: lastName,
+      address: address,
+      city: city,
+      email: email,
+    },
+    products: test(cartData),
+  };
+
+  console.log(city);
+  console.log(order);
+
+  localStorage.setItem("order", JSON.stringify(order));
+  fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify(order),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("por aqui");
+      data.orderId; // this is the confirmation number
+      console.log(data.orderId);
+      // use urlSearchParams
+
+      const orderIdConfirmation = "confirmation.html?orderId=" + data.orderId;
+      // create a variable with confirmation page url using the orderId
+      window.location.href = orderIdConfirmation;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+let orderButton = document.getElementById("order");
+orderButton.addEventListener("click", (e) => {
+  e.preventDefault();
+  createOrderInfo(cartProducts);
+});
+
+// regular expressions for validation
+let emailRegExp =
+  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+let charAlphaRegExp = /^[A-Za-z -]{3,32}$/;
+let addressRegExp = /^[A-Za-z0-9 ]{7,32}$/;
+const firstName = document.getElementById("firstName");
+const lastName = document.getElementById("lastName");
+const address = document.getElementById("address");
+const city = document.getElementById("city");
+const email = document.getElementById("email");
+
+function validationField(field, errorHandleId, regExp) {
+  field.addEventListener("change", checkFieldContent);
+  let ErrorMsg = document.getElementById(errorHandleId);
+  function checkFieldContent() {
+    if (regExp.test(field.value)) {
+      ErrorMsg.innerHTML = null;
+      field.style.border = "2px solid green";
+      validFirstName = true;
+    } else if (regExp.test(field.value) === false || field.value === "") {
+      ErrorMsg.innerHTML = "Please enter a valid first " + field.name;
+      field.style.border = "2px solid red";
+      validFirstName = false;
+    }
+  }
+}
+validationField(firstName, "firstNameErrorMsg", charAlphaRegExp);
+validationField(lastName, "lastNameErrorMsg", charAlphaRegExp);
+validationField(address, "addressErrorMsg", addressRegExp);
+validationField(city, "cityErrorMsg", charAlphaRegExp);
+validationField(email, "emailErrorMsg", emailRegExp);
