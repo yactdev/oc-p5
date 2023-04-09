@@ -5,8 +5,11 @@ let cartProducts = JSON.parse(localStorage.getItem("cart"));
 const ARTICLES = document.querySelector(".cart__item");
 const DELETE_BUTTON = document.querySelector(".deleteItem");
 const SECTION = document.querySelector("#cart__items");
+
+// verification of cart status
 function checkCart() {
-  if (!cartProducts) {
+  let cartProducts = JSON.parse(localStorage.getItem("cart"));
+  if (!cartProducts || cartProducts == 0) {
     alert("The car is empty");
     const emptyCart = [];
     localStorage.setItem("cart", JSON.stringify(emptyCart)); //
@@ -14,7 +17,9 @@ function checkCart() {
     getProducts();
   }
 }
+
 checkCart();
+
 // Get products information from the server.
 async function getProducts() {
   let x = await fetch("http://localhost:3000/api/products/")
@@ -24,12 +29,16 @@ async function getProducts() {
       calcTotal(productsInfo);
     })
     .then(() => {
+      addListener();
+    })
+    .then(() => {
       console.log("otro");
     });
 }
 
 // add HTML elements to the DOM
 function renderCartItems(productsInfo) {
+  let cartProducts = JSON.parse(localStorage.getItem("cart"));
   cartProducts.forEach((product) => {
     let productInCart = productsInfo.find(
       (productsInfo) => productsInfo._id === product.id
@@ -84,6 +93,68 @@ function calcTotal(cartInfo) {
   htmlAmount.innerHTML = totalCartAmount;
 }
 
+// add listener to the article items
+function clearDOM() {
+  console.log("deleting DOM....");
+  let productHolder = document.querySelectorAll(".cart__item");
+  productHolder.forEach((element) => {
+    element.remove();
+  });
+}
+function deleteOne(element) {
+  const cartArray = JSON.parse(localStorage.getItem("cart"));
+  const article = element.closest("article");
+  const color = article.getAttribute("data-color");
+  const id = article.getAttribute("data-id");
+
+  console.log("color:", color);
+  const filterResult = cartArray.filter(
+    (obj) => obj.id != id || obj.color != color
+  );
+  console.log("resultado color", filterResult.color);
+  localStorage.setItem("cart", JSON.stringify(filterResult));
+
+  clearDOM();
+  console.log("deleted DOM....");
+  checkCart();
+}
+
+function changeQuantity(element) {
+  const cartArray = JSON.parse(localStorage.getItem("cart"));
+  const article = element.closest("article");
+  const color = article.getAttribute("data-color");
+  const id = article.getAttribute("data-id");
+  const qtyValue = element.value;
+  const getProductQty = cartArray.findIndex(
+    (obj) => obj.id == id && obj.color == color
+  );
+  cartArray[getProductQty].qty = qtyValue;
+  if (element.value > 0 && element.value < 100) {
+    localStorage.setItem("cart", JSON.stringify(cartArray));
+  } else {
+    alert("Please select a valid quantity between 1 and 100");
+  }
+  clearDOM();
+  checkCart();
+}
+
+// Add event listener to the articles
+
+function addListener() {
+  let deleteItems = document.querySelectorAll(".deleteItem");
+  let changeQuantities = document.querySelectorAll(".itemQuantity");
+  deleteItems.forEach((element) => {
+    element.addEventListener("click", () => {
+      deleteOne(element);
+    });
+    changeQuantities.forEach((element) => {
+      element.addEventListener("change", () => {
+        changeQuantity(element);
+      });
+    });
+  });
+}
+
 //// Send order data to the server
 
 function test(cartData) {
@@ -114,7 +185,7 @@ function createOrderInfo(cartData) {
   console.log(city);
   console.log(order);
 
-  localStorage.setItem("order", JSON.stringify(order)); //
+  localStorage.setItem("order", JSON.stringify(order));
   fetch("http://localhost:3000/api/products/order", {
     method: "POST",
     headers: {
