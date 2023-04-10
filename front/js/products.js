@@ -105,7 +105,7 @@ addButton.addEventListener("click", (e) => {
 
 function qtyValidation(qty) {
   if (qty >= 1 && qty <= 100) {
-    //// Addig products to the localstorage
+    //// Addig products to the localstorage.
     return true;
   }
 }
